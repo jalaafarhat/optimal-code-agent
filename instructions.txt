@@ -1,0 +1,4 @@
+1- cd C:\Users\jalaa\Documents\GitHub\optimal-code-agent
+2- .venv\Scripts\activate.bat
+3- cd "agents_folder"
+4- adk web or python basic_stateful_session.py

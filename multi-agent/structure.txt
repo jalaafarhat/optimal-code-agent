@@ -1,0 +1,18 @@
+User Request
+     ↓
+Policy Agent
+     ↓
+┌───────────────┐
+│ access_granted│
+│   == true     │─────▶ Domain Agent (Stock / Crypto / Business)
+└───────────────┘
+     │
+     │ access_granted == false
+     ▼
+Sales Agent
+     ↓
+Purchase Completed
+     ↓
+Policy Agent (re-check)
+     ↓
+Domain Agent

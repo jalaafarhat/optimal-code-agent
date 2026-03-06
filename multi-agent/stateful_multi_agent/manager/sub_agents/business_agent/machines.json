@@ -1,0 +1,30 @@
+{
+    "ice vending machine": {
+        "price_usd": 5000,
+        "shipping_estimate": 1000,
+        "power": "220V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
+    },
+    "230v ice vending machine": {
+        "price_usd": 5000,
+        "shipping_estimate": 1000,
+        "power": "220V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
+    },
+    "ice cube machine": {
+        "price_usd": 1000.0,
+        "shipping_estimate": 1000,
+        "power": "115V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
+    },
+    "ice cube machine 230v": {
+        "price_usd": 249.0,
+        "shipping_estimate": 1000,
+        "power": "220V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
+    }
+}

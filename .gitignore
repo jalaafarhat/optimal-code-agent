@@ -1,0 +1,11 @@
+# Environment variables
+.env
+.env.local
+*.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Optional: any other sensitive files
+machines.json   # if it contains auto-added data that might include API keys? (unlikely, but safe)
