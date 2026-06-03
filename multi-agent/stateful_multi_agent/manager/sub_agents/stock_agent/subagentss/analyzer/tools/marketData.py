@@ -316,6 +316,165 @@ def get_multiple_prices(tickers: list) -> dict:
             results[ticker] = f"Error: {str(e)}"
     return results
 
+
+def get_stock_fundamentals(ticker: str) -> dict:
+    """
+    Get fundamental financial data for a stock (market cap, P/E, revenue, etc.)
+
+    Parameters:
+    ticker (str): Stock ticker symbol (e.g., 'AAPL', 'MSFT')
+
+    Returns:
+    dict: Fundamental metrics from yfinance
+    """
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        return {
+            "ticker": ticker.upper(),
+            "name": info.get("longName") or info.get("shortName"),
+            "sector": info.get("sector"),
+            "industry": info.get("industry"),
+            "market_cap": info.get("marketCap"),
+            "pe_ratio": info.get("trailingPE"),
+            "forward_pe": info.get("forwardPE"),
+            "peg_ratio": info.get("pegRatio"),
+            "price_to_book": info.get("priceToBook"),
+            "dividend_yield": info.get("dividendYield"),
+            "beta": info.get("beta"),
+            "fifty_two_week_high": info.get("fiftyTwoWeekHigh"),
+            "fifty_two_week_low": info.get("fiftyTwoWeekLow"),
+            "average_volume": info.get("averageVolume"),
+            "revenue": info.get("totalRevenue"),
+            "profit_margin": info.get("profitMargins"),
+            "return_on_equity": info.get("returnOnEquity"),
+            "debt_to_equity": info.get("debtToEquity"),
+            "free_cash_flow": info.get("freeCashflow"),
+            "eps": info.get("trailingEps"),
+            "currency": info.get("currency", "USD"),
+        }
+    except Exception as e:
+        return {"ticker": ticker.upper(), "error": str(e)}
+
+
+def get_analyst_recommendations(ticker: str) -> dict:
+    """
+    Get analyst consensus and price targets for a stock.
+
+    Parameters:
+    ticker (str): Stock ticker symbol
+
+    Returns:
+    dict: Analyst recommendations and price targets
+    """
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        recs = stock.recommendations
+        recent_recs = []
+        if recs is not None and not recs.empty:
+            for _, row in recs.tail(5).iterrows():
+                recent_recs.append({
+                    "firm": row.get("Firm", "Unknown"),
+                    "grade": row.get("To Grade", row.get("Action", "N/A")),
+                    "date": str(row.name) if hasattr(row, "name") else "N/A",
+                })
+        return {
+            "ticker": ticker.upper(),
+            "target_mean_price": info.get("targetMeanPrice"),
+            "target_high_price": info.get("targetHighPrice"),
+            "target_low_price": info.get("targetLowPrice"),
+            "recommendation_key": info.get("recommendationKey"),
+            "number_of_analysts": info.get("numberOfAnalystOpinions"),
+            "recent_recommendations": recent_recs,
+        }
+    except Exception as e:
+        return {"ticker": ticker.upper(), "error": str(e)}
+
+
+def get_technical_summary(ticker: str, period: str = "1y") -> dict:
+    """
+    Get technical analysis summary: moving averages, returns, volatility.
+
+    Parameters:
+    ticker (str): Stock ticker symbol
+    period (str): History period (default '1y')
+
+    Returns:
+    dict: Technical indicators and performance metrics
+    """
+    try:
+        stock = yf.Ticker(ticker)
+        history = stock.history(period=period)
+        if history.empty:
+            return {"ticker": ticker.upper(), "error": "No historical data"}
+
+        close = history["Close"]
+        current = float(close.iloc[-1])
+        sma_50 = float(close.rolling(50).mean().iloc[-1]) if len(close) >= 50 else None
+        sma_200 = float(close.rolling(200).mean().iloc[-1]) if len(close) >= 200 else None
+
+        start_price = float(close.iloc[0])
+        period_return_pct = round(((current - start_price) / start_price) * 100, 2)
+        daily_returns = close.pct_change().dropna()
+        volatility = round(float(daily_returns.std()) * (252 ** 0.5) * 100, 2)
+
+        return {
+            "ticker": ticker.upper(),
+            "current_price": round(current, 2),
+            "period": period,
+            "period_return_pct": period_return_pct,
+            "annualized_volatility_pct": volatility,
+            "sma_50": round(sma_50, 2) if sma_50 else None,
+            "sma_200": round(sma_200, 2) if sma_200 else None,
+            "above_sma_50": current > sma_50 if sma_50 else None,
+            "above_sma_200": current > sma_200 if sma_200 else None,
+            "high_52w": round(float(close.max()), 2),
+            "low_52w": round(float(close.min()), 2),
+        }
+    except Exception as e:
+        return {"ticker": ticker.upper(), "error": str(e)}
+
+
+def calculate_profit_scenario(
+    current_price: float,
+    target_price: float,
+    investment_amount: float,
+    currency: str = "USD",
+) -> dict:
+    """
+    Calculate profit/loss for a stock investment scenario.
+
+    Parameters:
+    current_price (float): Current stock price in USD
+    target_price (float): Target price in USD
+    investment_amount (float): Amount to invest in user's currency
+    currency (str): Currency code (USD, ILS, EUR). Default USD.
+
+    Returns:
+    dict: Shares, profit, and return percentage
+    """
+    rates = {"USD": 1.0, "ILS": 0.27, "EUR": 1.10, "GBP": 1.27}
+    rate = rates.get(currency.upper(), 1.0)
+    usd_amount = investment_amount * rate
+
+    if current_price <= 0:
+        return {"error": "Invalid current price"}
+
+    shares = usd_amount / current_price
+    profit = shares * (target_price - current_price)
+    return_pct = ((target_price - current_price) / current_price) * 100
+
+    return {
+        "shares": round(shares, 6),
+        "investment_usd": round(usd_amount, 2),
+        "current_price": current_price,
+        "target_price": target_price,
+        "profit_usd": round(profit, 2),
+        "return_pct": round(return_pct, 2),
+        "currency": currency.upper(),
+    }
+
 # Test function
 def test_price_fetch(ticker: str = "AAPL") -> bool:
     """Test the price fetcher with a given ticker"""

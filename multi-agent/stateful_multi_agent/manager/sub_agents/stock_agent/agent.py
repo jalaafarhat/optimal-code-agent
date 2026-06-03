@@ -1,18 +1,41 @@
-"""
-Sequential Agent with a Minimal Callback
+import os
 
-This example demonstrates a lead qualification pipeline with a minimal
-before_agent_callback that only initializes state once at the beginning.
-"""
+from google.adk.agents import Agent
 
-from google.adk.agents import SequentialAgent
+from config import GEMINI_MODEL
 
-from .subagentss.analyzer.agent import analyzer_agent
-from .subagentss.mathmaker.agent import math_agent
+from .subagentss.analyzer.tools.marketData import (
+    calculate_profit_scenario,
+    get_analyst_recommendations,
+    get_current_price,
+    get_multiple_prices,
+    get_price_history,
+    get_stock_fundamentals,
+    get_technical_summary,
+)
 
-# Create the sequential agent with minimal callback
-stock_agent = SequentialAgent(
-    name="LeadQualificationPipeline",
-    sub_agents=[analyzer_agent,math_agent],
-    description="A pipeline that analyzes and do the math of a stock",
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_instructions(path: str) -> str:
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+instructions = load_instructions(os.path.join(BASE_DIR, "prompt.md"))
+
+stock_agent = Agent(
+    name="stock_agent",
+    model=GEMINI_MODEL,
+    description="Stock market analyst for equities, ETFs, and public companies",
+    instruction=instructions,
+    tools=[
+        get_current_price,
+        get_price_history,
+        get_multiple_prices,
+        get_stock_fundamentals,
+        get_analyst_recommendations,
+        get_technical_summary,
+        calculate_profit_scenario,
+    ],
 )

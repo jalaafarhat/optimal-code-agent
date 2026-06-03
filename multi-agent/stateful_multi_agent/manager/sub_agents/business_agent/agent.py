@@ -6,6 +6,8 @@ from serpapi import GoogleSearch
 
 from google.adk.agents import Agent
 
+from config import GEMINI_MODEL
+
 # Load environment variables from .env
 load_dotenv()
 
@@ -40,11 +42,11 @@ def save_machine_db(data):
 # HELPER: Google Search via SerpAPI
 # ==========================================
 SERPAPI_API_KEY = os.getenv("SERPAPI_API_KEY")
-if not SERPAPI_API_KEY:
-    raise ValueError("SERPAPI_API_KEY not found in .env file")
 
 def google_search_api(query: str, num_results: int = 5) -> list:
     """Fetch Google search results using SerpAPI."""
+    if not SERPAPI_API_KEY:
+        return [{"error": "SERPAPI_API_KEY not configured. Machine search unavailable."}]
     params = {
         "q": query,
         "api_key": SERPAPI_API_KEY,
@@ -263,7 +265,7 @@ def estimate_small_business_roi(
 # ==========================================
 business_agent = Agent(
     name="business_agent",
-    model="gemini-2.0-flash",
+    model=GEMINI_MODEL,
     description="An agent that finds profitable real-world businesses based on user budget, location and constraints.",
     instruction=instructions,
     tools=[

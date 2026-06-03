@@ -1,10 +1,13 @@
 import asyncio
 
-# Import the main customer service agent
-from stateful_multi_agent.manager.agent import root_agent
+import telemetry_patch
+
+telemetry_patch.apply()
+
 from dotenv import load_dotenv
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
+from stateful_multi_agent.manager.agent import root_agent
 from utils import add_user_query_to_history, call_agent_async
 
 load_dotenv()

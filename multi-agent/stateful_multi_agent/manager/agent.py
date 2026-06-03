@@ -9,6 +9,7 @@ from datetime import datetime
 
 import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+from config import GEMINI_MODEL
 
 def get_current_time() -> dict:
     """
@@ -28,7 +29,7 @@ instructions = load_instructions(
 
 root_agent  = Agent(
     name="manager",
-    model="gemini-2.0-flash",
+    model=GEMINI_MODEL,
     description="Manager agent",
     instruction=instructions,  # optional additional prompt instructions
     tools=[

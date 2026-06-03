@@ -26,5 +26,26 @@
         "power": "220V",
         "supplier_region": "China",
         "status": "partial_needs_verification"
+    },
+    "vending machine": {
+        "price_usd": 3000.0,
+        "shipping_estimate": 1000,
+        "power": "120V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
+    },
+    "heat press machine": {
+        "price_usd": 299.97,
+        "shipping_estimate": 1000,
+        "power": "220V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
+    },
+    "atm machine": {
+        "price_usd": 2000.0,
+        "shipping_estimate": 1000,
+        "power": "220V",
+        "supplier_region": "China",
+        "status": "partial_needs_verification"
     }
 }
